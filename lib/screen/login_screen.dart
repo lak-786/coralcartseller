@@ -1,9 +1,12 @@
 import 'package:coralcartseller/screen/home_screen.dart';
 import 'package:coralcartseller/screen/register_screen.dart';
+import 'package:coralcartseller/screen/root_screen.dart';
+import 'package:coralcartseller/services/firebase_auth_services.dart';
 import 'package:coralcartseller/utils/helper.dart';
 import 'package:coralcartseller/widgets/custom_button.dart';
 import 'package:coralcartseller/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:motion_toast/motion_toast.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,6 +17,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+  bool _loading=false;
 
   bool passwordVisibility = true;
   TextEditingController emailController = TextEditingController();
@@ -79,7 +83,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          CustomButton(buttonName: 'Login',onPressed: loginHandler,),
+          SizedBox(height: 30,),
+           _loading ? Center(child:CircularProgressIndicator(color: Colors.teal,),):
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: CustomButton(buttonName: 'Login',onPressed: loginHandler,),
+          ),
           
           
           Spacer(),
@@ -88,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Text(
                 "Dont have account",
-                style: TextStyle(color: const Color.fromARGB(255, 194, 69, 69)),
+                style: TextStyle(color: Color.fromARGB(255, 226, 24, 24)),
               ),
               TextButton(
                   style: ButtonStyle(
@@ -106,22 +115,49 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-void loginHandler(){
-  if(_formKey.currentState!.validate()){
-    print(emailController.text);
-    print(passwordController.text);
-                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomeScreen(),), (route) => false);
+void loginHandler() async {
+    if (_formKey.currentState!.validate()) {
+       FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+      try{
+        setState(() {
+          _loading= true;
+        });
+        
+        await firebaseAuthService.login(
+          
+          password: passwordController.text,
+        
+          email: emailController.text,
+        );
+        
+        _loading = false;
 
+        MotionToast.success(
+          title: Text("Success"),
+          description: Text("Login Successful"),
+        ).show(context);
 
+        if(context.mounted){
+          Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RootScreen(),
+          ),
+          (route) => false);
+        }
 
+      }
+      catch(e){
+        setState(() {
+          _loading = false;
+        });
+        String error = getFirebaseAuthErrorMessage(e);
 
-
+        MotionToast.warning(
+                title: Text("Warning"), 
+                description: Text(error))
+            .show(context);
+      }
+    }
   }
 }
-
-
-
-}
-
-
-

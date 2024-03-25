@@ -6,13 +6,15 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     required this.hintText,
     required this.label,
-    required this.validate
+    required this.validate,
+    this.input
   });
 
   final TextEditingController controller;
   final String hintText;
   final String label;
   final String? Function(String?) validate;
+  final  TextInputType? input;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,9 @@ class CustomTextField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         validator:validate,
+        keyboardType: input ?? TextInputType.text,
         decoration: InputDecoration(
+          
           label:  Text(label),
           hintText: hintText,
           border: OutlineInputBorder(

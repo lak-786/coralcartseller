@@ -1,7 +1,9 @@
+import 'package:coralcartseller/services/firebase_auth_services.dart';
 import 'package:coralcartseller/utils/helper.dart';
 import 'package:coralcartseller/widgets/custom_button.dart';
 import 'package:coralcartseller/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:motion_toast/motion_toast.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,15 +15,18 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController shopNameController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+  bool _loading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          
           title: Text(
             'Register',
             style: TextStyle(fontWeight: FontWeight.w700, fontSize: 30),
@@ -29,6 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           centerTitle: true,
         ),
         body: SingleChildScrollView(
+
           child: Form(
             key: _formKey,
             child: Column(children: [
@@ -46,6 +52,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 },
               ),
               SizedBox(
+                height: 40,
+              ),
+              CustomTextField(
+                controller: addressController,
+                hintText: 'Enter your Address',
+                label: 'Address',
+                validate: (value) {
+                  if (value!.isEmpty) {
+                    return "fill the address";
+                  }
+                },
+              ),
+              SizedBox(
                 height: 20,
               ),
               CustomTextField(
@@ -56,6 +75,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return validateMail(value!);
                 },
               ),
+
+
+
               SizedBox(
                 height: 20,
               ),
@@ -69,6 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   }
                 },
               ),
+
               SizedBox(
                 height: 20,
               ),
@@ -99,19 +122,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   }
                 },
               ),
+              _loading ? Center(child:CircularProgressIndicator(color: Colors.teal,),):
               CustomButton(buttonName: 'Register', onPressed: registerHandler)
             ]),
           ),
         ));
   }
 
-  void registerHandler() {
+  void registerHandler() async{
     if (_formKey.currentState!.validate()) {
-      print(shopNameController.text);
-      print(emailController.text);
-      print(phoneController.text);
-      print(passwordController.text);
-      print(confirmPasswordController.text);
+     FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+     try{
+      setState(() {
+          _loading= true;
+        });
+       await firebaseAuthService.register(
+      name:shopNameController.text ,
+      address:addressController.text,
+      password: passwordController.text,
+      phoneNumber: phoneController.text,
+      email: emailController.text, 
+    );
+    _loading = false;
+
+        MotionToast.success(
+          title: Text("Success"),
+          description: Text("Registration Successful"),
+        ).show(context);
+
+        Navigator.pop(context);
+      } catch (e) {
+        setState(() {
+          _loading = false;
+        });
+        String error = getFirebaseAuthErrorMessage(e);
+
+        MotionToast.warning(
+                title: Text("Warning"), 
+                description: Text(error))
+            .show(context);
+     }
     }
   }
 }
+ 
