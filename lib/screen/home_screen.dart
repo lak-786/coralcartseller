@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coralcartseller/screen/add_screen.dart';
 import 'package:coralcartseller/screen/product_details.dart';
 import 'package:coralcartseller/services/firebase_add_product.dart';
+import 'package:coralcartseller/services/firebase_auth_services.dart';
 import 'package:coralcartseller/widgets/custom_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('product').snapshots(),
+              stream: FirebaseFirestore.instance.collection('product').where('sellerId' ,isEqualTo: FirebaseAuthService().getSellerId()).snapshots(),
               builder: (context,snapshot) {
                 if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');

@@ -10,7 +10,7 @@ class OrderScreen extends StatelessWidget {
           'Cart',
           style: TextStyle(color: Colors.white), // Set text color to white
         ),
-        actions: [
+        actions: [ 
           IconButton(
             icon: Icon(Icons.shopping_cart,
                 color: Colors.white), // Set icon color to white

@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,14 +13,20 @@ import 'package:image_picker/image_picker.dart';
 import 'package:motion_toast/motion_toast.dart';
 
 class UpdateScreen extends StatefulWidget {
-   UpdateScreen({super.key,required this.productId,required this.productname,required this.price,required this.discription,required this.category,required this.image});
+  UpdateScreen(
+      {super.key,
+      required this.productId,
+      required this.productname,
+      required this.price,
+      required this.discription,
+      required this.category,
+      required this.image});
   String productId;
   String image;
   String productname;
   String price;
   String discription;
   String category;
-
 
   @override
   State<UpdateScreen> createState() => _UpdateScreenState();
@@ -90,17 +95,15 @@ class _UpdateScreenState extends State<UpdateScreen> {
       },
     );
   }
+
   @override
   void initState() {
-    
     PriceController.text = widget.price;
-    ProductNameController.text=widget.productname;
-    discriptionController.text=widget.discription;
-    
+    ProductNameController.text = widget.productname;
+    discriptionController.text = widget.discription;
+
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,13 +120,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
                 key: _formKey,
                 child: Column(children: [
                   _imageFile == null
-                      ? 
-
-                     
-                      
-                      
-                       
-                      Stack(
+                      ? Stack(
                           children: [
                             Container(
                               width: MediaQuery.of(context).size.width,
@@ -151,14 +148,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
                             )
                           ],
                         )
-                  
-                  
-                  
-                     
-                     
-                      : 
-                      
-                      Stack(
+                      : Stack(
                           children: [
                             Container(
                               width: MediaQuery.of(context).size.width,
@@ -188,9 +178,6 @@ class _UpdateScreenState extends State<UpdateScreen> {
                             )
                           ],
                         ),
-                  
-                  
-                  
                   SizedBox(
                     height: 20,
                   ),
@@ -285,12 +272,13 @@ class _UpdateScreenState extends State<UpdateScreen> {
                                   _loading = true;
                                 });
                                 await FirebaseProductService().updateProduct(
-                                  id: widget.productId,
+                                    id: widget.productId,
                                     image: _imageFile!,
                                     productname: ProductNameController.text,
                                     price: PriceController.text,
                                     discription: discriptionController.text,
-                                    category:  _selectedCategory!.get('category'),
+                                    category:
+                                        _selectedCategory!.get('category'),
                                     catId: _selectedCategory!.id);
                                 Navigator.pop(context);
                                 _loading = false;
@@ -312,4 +300,4 @@ class _UpdateScreenState extends State<UpdateScreen> {
                         ),
                 ]))));
   }
-} 
+}

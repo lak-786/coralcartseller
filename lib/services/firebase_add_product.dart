@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coralcartseller/services/firebase_auth_services.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
 
 class FirebaseProductService {
   final _firebaseStore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  
 
   Future<void> addProduct({
     required File image,
@@ -32,7 +34,8 @@ _firebaseStore.collection('product').doc().set({
   'discription':discription,
   'category': category,
   'image': downloadURL,
-  'catId' : catId
+  'catId' : catId,
+  'sellerId':FirebaseAuthService().getSellerId()
   
 }
 
@@ -96,4 +99,5 @@ Future<void> deleteProduct({
 
     }
 
+ 
 }

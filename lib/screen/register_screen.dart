@@ -123,7 +123,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 },
               ),
               _loading ? Center(child:CircularProgressIndicator(color: Colors.teal,),):
-              CustomButton(buttonName: 'Register', onPressed: registerHandler)
+              Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30,vertical: 20 ),
+            child:   CustomButton(buttonName: 'Register', onPressed: registerHandler)
+              )
             ]),
           ),
         ));

@@ -26,7 +26,8 @@ class FirebaseAuthService {
       'name': name,
       'email': email,
       'phoneNumber': phoneNumber,
-      'password' : password
+      'password' : password,
+      'address':address,
     });
     print('================================================================');
     await _firebaseStore.collection('logintb').doc(user.uid).set({
@@ -66,4 +67,43 @@ class FirebaseAuthService {
       rethrow;
     }
   }
+
+    String  getSellerId(){
+
+   return _firebaseAuth.currentUser!.uid;
+
+  }
+
+  Future<void> editprofile({
+
+    required String shopname, 
+    required String email,
+     required String phone,
+      required String address
+      
+      })async{
+        try{
+
+          _firebaseStore.collection('sellerRegistration').doc(getSellerId()).update({
+            'name':shopname,
+           'email':email,
+           'phoneNumber':phone,
+           'address':address
+            
+          });
+
+        }catch(e)
+        {
+          
+            rethrow;
+          
+
+        }
+
+     
+
+
+
+  }
+
 }
