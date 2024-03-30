@@ -1,72 +1,110 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class OrderScreen extends StatelessWidget {
+class OrderScreen extends StatefulWidget {
+  const OrderScreen({super.key});
+
+  @override
+  State<OrderScreen> createState() => _OrderScreenState();
+}
+
+class _OrderScreenState extends State<OrderScreen> {
+  List orderList = [];
+  List ordersProductList = [];
+
+  final fireStore = FirebaseFirestore.instance;
+
+  bool loading = false;
+
+  @override
+  void initState() {
+    getSellerIdsFromOrders();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.teal, // Set app bar background color to teal
-        title: Text(
-          'Cart',
-          style: TextStyle(color: Colors.white), // Set text color to white
+        appBar: AppBar(
+          backgroundColor: Colors.teal,
+          title: const Text(
+            'Cart',
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.shopping_cart, color: Colors.white),
+              onPressed: () {},
+            ),
+          ],
         ),
-        actions: [ 
-          IconButton(
-            icon: Icon(Icons.shopping_cart,
-                color: Colors.white), // Set icon color to white
-            onPressed: () {
-              // Navigate to the cart screen
-            },
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(16),
-        children: [
-          CartItemTile(
-            productName: 'Product 1',
-            price: 10.0,
-            imageUrl: 'https://via.placeholder.com/150',
-          ),
-          SizedBox(height: 16),
-          CartItemTile(
-            productName: 'Product 2',
-            price: 20.0,
-            imageUrl: 'https://via.placeholder.com/150',
-          ),
-          SizedBox(height: 16),
-          CartItemTile(
-            productName: 'Product 3',
-            price: 30.0,
-            imageUrl: 'https://via.placeholder.com/150',
-          ),
-          SizedBox(height: 16),
-          CartItemTile(
-            productName: 'Product 3',
-            price: 30.0,
-            imageUrl: 'https://via.placeholder.com/150',
-          ),
-          SizedBox(height: 16),
-          CartItemTile(
-            productName: 'Product 3',
-            price: 30.0,
-            imageUrl: 'https://via.placeholder.com/150',
-          ),
-        ],
-      ),
-    );
+        body: loading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ordersProductList.isEmpty
+                ? Text('No data')
+                : ListView.builder(
+                    itemCount: ordersProductList.length,
+                    itemBuilder: (context, index) {
+                      // Access the data from each document and pass it to the CartItemTile
+                      Map<String, dynamic> orderData = ordersProductList[index];
+
+                     
+                      return CartItemTile(
+                        productName: orderData['productname'],
+                        price: orderData['subtotal'],
+                      );
+                    },
+                  ));
+  }
+
+  Future<void> getSellerIdsFromOrders() async {
+    try {
+    
+
+      setState(() {
+        loading = false;
+      });
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+          await fireStore.collection('orders').get();
+
+      snapshot.docs.forEach((doc) {
+        
+        List productlist = doc['productlist'];
+    
+        productlist.forEach((element) {
+          if (element['sellerid'] == FirebaseAuth.instance.currentUser!.uid) {
+          
+       
+            ordersProductList.add(element);
+            orderList.add(doc.id);
+
+           
+          }
+        });
+      });
+
+      setState(() {
+        loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 }
 
 class CartItemTile extends StatelessWidget {
   final String productName;
-  final double price;
-  final String imageUrl;
+  final String price;
 
   const CartItemTile({
+    super.key,
     required this.productName,
     required this.price,
-    required this.imageUrl,
   });
 
   @override
@@ -75,16 +113,33 @@ class CartItemTile extends StatelessWidget {
       elevation: 4,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundImage: NetworkImage(imageUrl),
+          child: Icon(Icons.person),
         ),
         title: Text(productName),
-        subtitle: Text('Price: \$${price.toStringAsFixed(2)}'),
-        trailing: IconButton(
-          icon: Icon(Icons.delete),
-          color: Colors.black, // Set icon color to black
+        subtitle: Text('Price: \$${price}'),
+        trailing: ElevatedButton(
           onPressed: () {
-            // Implement logic to remove item from cart
+
+
+
           },
+          child: Text(
+            'Details',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal, // Background color
+
+            padding: EdgeInsets.symmetric(
+                vertical: 12, horizontal: 24), // Button padding
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8), // Button border radius
+            ),
+          ),
         ),
       ),
     );

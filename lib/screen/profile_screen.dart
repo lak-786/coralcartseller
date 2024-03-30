@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:coralcartseller/screen/edit_profile.dart';
+import 'package:coralcartseller/screen/login_screen.dart';
 import 'package:coralcartseller/services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,26 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
+        actions: [
+          TextButton.icon(
+            onPressed: () async{
+              try{
+               await  FirebaseAuthService().logout();
+               Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context) =>LoginScreen() ,),(route) => false,);
+               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('Log Out Sucssefully')));
+
+              }catch(e){
+                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('Log Out failed')));
+
+
+              }
+            
+          },
+          label: Text('Log Out',style: TextStyle(color: Colors.red),),
+          
+          
+           icon: Icon(Icons.logout,color: Colors.red,),)
+        ],
       ),
       body: StreamBuilder(
           stream: FirebaseFirestore.instance
@@ -16,6 +37,7 @@ class ProfileScreen extends StatelessWidget {
               .doc(FirebaseAuthService().getSellerId())
               .snapshots(),
           builder: (context, snapshot) {
+          
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             }

@@ -17,12 +17,12 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  bool _loading=false;
+  bool _loading = false;
 
   bool passwordVisibility = true;
   TextEditingController emailController = TextEditingController();
 
-  TextEditingController passwordController= TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,9 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
             label: 'Email',
             validate: (value) {
               return validateMail(value!);
-              
             },
-            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 20, right: 20, top: 30),
             child: TextFormField(
@@ -57,15 +56,16 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: InputDecoration(
                 label: const Text('Password'),
                 hintText: 'Enter your password',
-                suffixIcon:
-                    IconButton(onPressed: () {
-                      setState(() {
-                        passwordVisibility= !passwordVisibility;
-                      });
-                    }, icon: Icon(
-                      passwordVisibility ? Icons.visibility :Icons.visibility_off
-                      ),
-                    ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    setState(() {
+                      passwordVisibility = !passwordVisibility;
+                    });
+                  },
+                  icon: Icon(passwordVisibility
+                      ? Icons.visibility
+                      : Icons.visibility_off),
+                ),
                 border: OutlineInputBorder(
                     borderSide: const BorderSide(color: Colors.grey)),
                 enabledBorder: OutlineInputBorder(
@@ -83,14 +83,22 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          SizedBox(height: 30,),
-           _loading ? Center(child:CircularProgressIndicator(color: Colors.teal,),):
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: CustomButton(buttonName: 'Login',onPressed: loginHandler,),
+          SizedBox(
+            height: 30,
           ),
-          
-          
+          _loading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.teal,
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: CustomButton(
+                    buttonName: 'Login',
+                    onPressed: loginHandler,
+                  ),
+                ),
           Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -105,8 +113,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         MaterialStateProperty.all<Color>(Colors.blue),
                   ),
                   onPressed: () {
-
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterScreen(),));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RegisterScreen(),
+                        ));
                   },
                   child: const Text('Register')),
             ],
@@ -115,21 +126,20 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-void loginHandler() async {
+
+  void loginHandler() async {
     if (_formKey.currentState!.validate()) {
-       FirebaseAuthService firebaseAuthService = FirebaseAuthService();
-      try{
+      FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+      try {
         setState(() {
-          _loading= true;
+          _loading = true;
         });
-        
+
         await firebaseAuthService.login(
-          
           password: passwordController.text,
-        
           email: emailController.text,
         );
-        
+
         _loading = false;
 
         MotionToast.success(
@@ -137,25 +147,21 @@ void loginHandler() async {
           description: Text("Login Successful"),
         ).show(context);
 
-        if(context.mounted){
+        if (context.mounted) {
           Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RootScreen(),
-          ),
-          (route) => false);
+              context,
+              MaterialPageRoute(
+                builder: (context) => RootScreen(),
+              ),
+              (route) => false);
         }
-
-      }
-      catch(e){
+      } catch (e) {
         setState(() {
           _loading = false;
         });
         String error = getFirebaseAuthErrorMessage(e);
 
-        MotionToast.warning(
-                title: Text("Warning"), 
-                description: Text(error))
+        MotionToast.warning(title: Text("Warning"), description: Text(error))
             .show(context);
       }
     }

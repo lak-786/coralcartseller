@@ -1,6 +1,7 @@
 import 'package:coralcartseller/screen/home_screen.dart';
 import 'package:coralcartseller/screen/order_screen.dart';
 import 'package:coralcartseller/screen/profile_screen.dart';
+import 'package:coralcartseller/screen/review_screen.dart';
 import 'package:flutter/material.dart';
 
 class RootScreen extends StatefulWidget {
@@ -14,8 +15,9 @@ class _RootScreenState extends State<RootScreen> {
   // Define your screens here
    List<Widget> _screens = [
 
-    HomeScreen(),
+    const HomeScreen(),
     OrderScreen(),
+    ReviewPage(),
     ProfileScreen(),
 
     
@@ -33,28 +35,37 @@ class _RootScreenState extends State<RootScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('CORALCART SELLER', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25,color: Colors.white),),
+        title: const Text('CORALCART SELLER', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25,color: Colors.white),),
          backgroundColor: Colors.teal,
          centerTitle: true,
       ),
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
+        showUnselectedLabels: true,
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
+           BottomNavigationBarItem(
             icon: Icon(Icons.book_online),
             label: 'Order',
+          ),
+          
+          BottomNavigationBarItem(
+            icon: Icon(Icons.rate_review),
+            label: 'Review',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
           ),
+          
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.black,
+        type: BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
       ),
     );
