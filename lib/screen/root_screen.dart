@@ -17,7 +17,7 @@ class _RootScreenState extends State<RootScreen> {
 
     const HomeScreen(),
     OrderScreen(),
-    ReviewPage(),
+   ReviewViewScreen (),
     ProfileScreen(),
 
     
@@ -34,11 +34,27 @@ class _RootScreenState extends State<RootScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('CORALCART SELLER', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25,color: Colors.white),),
-         backgroundColor: Colors.teal,
-         centerTitle: true,
-      ),
+   appBar: AppBar(
+  title: const Text(
+    'CORALCART SELLER',
+    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 25, color: Colors.white),
+  ),
+  backgroundColor: Colors.teal,
+  centerTitle: true,
+  leading: Padding(
+    padding: const EdgeInsets.only(left: 16.0), // Adjust the padding value as needed
+    child: IconButton(
+      icon: Image.asset('assets/images/logo.png',
+      width: 30,
+      height: 30), // Replace 'assets/your_logo.png' with your logo file path
+      onPressed: () {
+        // Action to perform when the logo is pressed, if needed
+      },
+    ),
+  ),
+),
+
+
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         showUnselectedLabels: true,

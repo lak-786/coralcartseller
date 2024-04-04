@@ -1,82 +1,77 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coralcartseller/services/firebase_add_product.dart';
+import 'package:coralcartseller/services/firebase_auth_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-class ReviewPage extends StatefulWidget {
-  @override
-  _ReviewPageState createState() => _ReviewPageState();
-}
+class ReviewViewScreen extends StatelessWidget {
+  
 
-class _ReviewPageState extends State<ReviewPage> {
-  List<String> reviews = [
-    "Great product!",
-    "Excellent service!",
-    "Needs improvement.",
-  ]; // Sample list of reviews, you can replace it with your data source
+  const ReviewViewScreen({super.key});
+  
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Reviews'),
+        title: Text('Review'),
       ),
-      body: ListView.builder(
-        itemCount: reviews.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(reviews[index]),
-            // Optionally, you can add other details like date, user info, etc.
+    
+     body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Review')
+            .where('sellerId', isEqualTo: FirebaseAuthService().getSellerId() )
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+          final reviews = snapshot.data!.docs;
+          if (reviews.isEmpty) {
+            return Center(
+              child: Text('No reviews found.'),
+            );
+          }
+          return ListView.builder(
+            itemCount: reviews.length,
+            itemBuilder: (context, index) {
+              final review = reviews[index].data() as Map<String, dynamic>;
+              return ListTile(
+                title: Text(review['userId']),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(review['review']),
+                    RatingBarIndicator(
+                      rating: review['rating'],
+                      itemBuilder: (context, index) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      itemCount: 5,
+                      itemSize: 20.0,
+                      direction: Axis.horizontal,
+                    ),
+                  ],
+                ),
+              );
+            },
           );
         },
       ),
-     
     );
+                       
+                       
+                       
   }
 }
 
-class AddReviewPage extends StatefulWidget {
-  @override
-  _AddReviewPageState createState() => _AddReviewPageState();
-}
 
-class _AddReviewPageState extends State<AddReviewPage> {
-  TextEditingController reviewController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Review'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            TextField(
-              controller: reviewController,
-              decoration: InputDecoration(
-                labelText: 'Write your review',
-              ),
-              maxLines: 3,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                // Add the review to the list and navigate back to the review page
-                setState(() {
-                  // Assuming the review is valid and you want to add it
-                  String newReview = reviewController.text;
-                  if (newReview.isNotEmpty) {
-                    // Add the new review to the list
-                    // You can replace this logic with your actual review submission process
-                    Navigator.pop(context, newReview);
-                  }
-                });
-              },
-              child: Text('Submit'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

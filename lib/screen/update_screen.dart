@@ -96,11 +96,26 @@ class _UpdateScreenState extends State<UpdateScreen> {
     );
   }
 
+   List<DocumentSnapshot> ? _categoryDocs;
+
+
+  Future<void> _getCategoryDocuments() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('category').get();
+      setState(() {
+        _categoryDocs = querySnapshot.docs;
+      });
+    } catch (error) {
+      print('Error fetching category documents: $error');
+    }
+  }
+
   @override
   void initState() {
     PriceController.text = widget.price;
     ProductNameController.text = widget.productname;
     discriptionController.text = widget.discription;
+    _getCategoryDocuments();
 
     super.initState();
   }
@@ -115,7 +130,9 @@ class _UpdateScreenState extends State<UpdateScreen> {
           ),
           centerTitle: true,
         ),
-        body: SingleChildScrollView(
+        body: _categoryDocs == null ?  const Center(
+          child: CircularProgressIndicator(),
+          ) : SingleChildScrollView(
             child: Form(
                 key: _formKey,
                 child: Column(children: [
@@ -217,52 +234,8 @@ class _UpdateScreenState extends State<UpdateScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('category')
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Loading indicator while waiting for data
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: DropdownButtonFormField<DocumentSnapshot>(
-                          value: _selectedCategory,
-                          onChanged: (DocumentSnapshot? newValue) {
-                            _selectedCategory = newValue;
-                          },
-                          items: snapshot.data!.docs
-                              .map((DocumentSnapshot document) {
-                            var data = document.data() as Map<String, dynamic>;
-                            return DropdownMenuItem<DocumentSnapshot>(
-                              value: document,
-                              child: Text(data['category']),
-                            );
-                          }).toList(),
-                          decoration: InputDecoration(
-                            labelText: 'Category',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  _loading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.teal,
-                          ),
-                        )
-                      : Padding(
+                   
+                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: CustomButton(
                             buttonName: 'Update',
@@ -273,13 +246,12 @@ class _UpdateScreenState extends State<UpdateScreen> {
                                 });
                                 await FirebaseProductService().updateProduct(
                                     id: widget.productId,
-                                    image: _imageFile!,
+                                    image: _imageFile,
                                     productname: ProductNameController.text,
                                     price: PriceController.text,
                                     discription: discriptionController.text,
-                                    category:
-                                        _selectedCategory!.get('category'),
-                                    catId: _selectedCategory!.id);
+                                   
+                                    );
                                 Navigator.pop(context);
                                 _loading = false;
                                 MotionToast.success(

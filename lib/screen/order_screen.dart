@@ -1,3 +1,4 @@
+import 'package:coralcartseller/screen/details_srceen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -120,8 +121,7 @@ class CartItemTile extends StatelessWidget {
         trailing: ElevatedButton(
           onPressed: () {
 
-
-
+            Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailsScreen(productName: '', price: '',),));
           },
           child: Text(
             'Details',

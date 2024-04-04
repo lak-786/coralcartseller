@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coralcartseller/screen/root_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:motion_toast/motion_toast.dart';
 
 class FirebaseAuthService {
   final _firebaseAuth = FirebaseAuth.instance;
@@ -26,13 +29,14 @@ class FirebaseAuthService {
         'phoneNumber': phoneNumber,
         'password': password,
         'address': address,
+        'status' : 'pending'
       });
       print('================================================================');
       await _firebaseStore.collection('logintb').doc(user.uid).set({
         'userid': user.uid,
         'email': email,
         'password': password,
-        'status': 0,
+        'status': 'pending',
         'role': 'seller'
       });
     } catch (e) {
@@ -53,13 +57,56 @@ class FirebaseAuthService {
       }
     }
   }
-
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({required String email, required String password ,required BuildContext context}) async {
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(
+     UserCredential ? user = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      print(user.user! );
+
+     
+
+     if(user != null){
+      print('hhhhhh');
+
+      var isSellerValid = await _firebaseStore.collection('sellerRegistration').doc(user.user!.uid).get();
+
+      var isApprove = isSellerValid.get('status');
+
+      print(isApprove);
+
+      if(isApprove == 'completed'){
+
+        MotionToast.success(
+          title: Text("Success"),
+          description: Text("Login Successful"),
+        ).show(context);
+
+        if (context.mounted) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => RootScreen(),
+              ),
+              (route) => false);
+        }
+
+
+      }else{
+
+        MotionToast.warning(
+          title: Text("Warning"),
+          description: Text("waiting for admin approvel"),
+        ).show(context);
+
+
+      }
+     }
+
+
+
     } catch (e) {
       rethrow;
     }
@@ -95,5 +142,13 @@ class FirebaseAuthService {
     } catch (e) {
       rethrow;
     }
+  }
+
+   Future<Map<String,dynamic>?>  getUser()async {
+
+    var data = await _firebaseStore.collection('sellerRegistration').doc(getSellerId()).get();
+    return data.data();
+
+    
   }
 }

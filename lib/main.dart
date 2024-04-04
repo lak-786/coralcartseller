@@ -8,6 +8,7 @@ import 'package:coralcartseller/screen/login_screen.dart';
 import 'package:coralcartseller/screen/order_screen.dart';
 import 'package:coralcartseller/screen/profile_screen.dart';
 import 'package:coralcartseller/screen/root_screen.dart';
+import 'package:coralcartseller/screen/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,7 @@ void main() async {
   );
   runApp(
     MaterialApp(
-      home:LoginScreen()
+      home:SplashScreen()
       
       ),
     );

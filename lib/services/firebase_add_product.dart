@@ -28,6 +28,8 @@ class FirebaseProductService {
       await uploadTask;
       String downloadURL = await ref.getDownloadURL();
 
+   var data =  await  FirebaseAuthService().getUser();
+
 _firebaseStore.collection('product').doc().set({
  'productname':productname,
   'price':price,
@@ -35,6 +37,7 @@ _firebaseStore.collection('product').doc().set({
   'category': category,
   'image': downloadURL,
   'catId' : catId,
+  'shopname': data!['name'] ,
   'sellerId':FirebaseAuthService().getSellerId()
   
 }
@@ -66,16 +69,17 @@ Future<void> deleteProduct({
     }
     Future<void> updateProduct({
     required String id,
-    required File image,
+    required File ? image,
     required String productname,
     required String price,
     required String discription,
-    required String catId,
-    required String category,
+
     
     }) async{
       try{
-        String fileName= basename(image.path);
+        if(image != null){
+
+          String fileName= basename(image.path);
         Reference ref = _storage.ref().child('product/$fileName');
          UploadTask uploadTask = ref.putFile(image);
       await uploadTask;
@@ -86,7 +90,18 @@ Future<void> deleteProduct({
            'productname':productname,
            'price':price,
            'discription':discription,
+
         });
+        }else{
+
+           _firebaseStore.collection('product').doc(id).update({
+           'productname':productname,
+           'price':price,
+           'discription':discription,
+
+        });
+
+        }
 
       }
       catch(e)

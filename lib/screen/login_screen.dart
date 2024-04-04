@@ -138,23 +138,16 @@ class _LoginScreenState extends State<LoginScreen> {
         await firebaseAuthService.login(
           password: passwordController.text,
           email: emailController.text,
+          context: context
         );
 
         _loading = false;
 
-        MotionToast.success(
-          title: Text("Success"),
-          description: Text("Login Successful"),
-        ).show(context);
+        setState(() {
+          
+        });
 
-        if (context.mounted) {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RootScreen(),
-              ),
-              (route) => false);
-        }
+        
       } catch (e) {
         setState(() {
           _loading = false;

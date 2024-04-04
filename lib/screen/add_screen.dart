@@ -82,6 +82,32 @@ class _AddScreenState extends State<AddScreen> {
       },
     );
   }
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    _getCategoryDocuments();
+    
+
+      
+
+    
+    super.initState();
+  }
+
+    List<DocumentSnapshot> ? _categoryDocs;
+
+
+  Future<void> _getCategoryDocuments() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('category').get();
+      setState(() {
+        _categoryDocs = querySnapshot.docs;
+      });
+    } catch (error) {
+      print('Error fetching category documents: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +119,9 @@ class _AddScreenState extends State<AddScreen> {
           ),
           centerTitle: true,
         ),
-        body: SingleChildScrollView(
+        body:_categoryDocs == null  ?  Center(
+          child: CircularProgressIndicator(),
+        )  :SingleChildScrollView(
             child: Form(
                 key: _formKey,
                 child: Column(children: [
@@ -184,28 +212,14 @@ class _AddScreenState extends State<AddScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('category')
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      }
-
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Loading indicator while waiting for data
-                      }
-
-                      return Padding(
+                  Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: DropdownButtonFormField<DocumentSnapshot>(
                           value: _selectedCategory,
                           onChanged: (DocumentSnapshot? newValue) {
                             _selectedCategory = newValue;
                           },
-                          items: snapshot.data!.docs
-                              .map((DocumentSnapshot document) {
+                          items: _categoryDocs!.map((DocumentSnapshot document) {
                            
 
                                
@@ -222,9 +236,9 @@ class _AddScreenState extends State<AddScreen> {
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    
+                  
                   SizedBox(height: 20),
                   _loading
                       ? Center(
