@@ -1,3 +1,4 @@
+import 'package:coralcartseller/screen/forgot_password.dart';
 import 'package:coralcartseller/screen/home_screen.dart';
 import 'package:coralcartseller/screen/register_screen.dart';
 import 'package:coralcartseller/screen/root_screen.dart';
@@ -99,6 +100,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: loginHandler,
                   ),
                 ),
+                SizedBox(height: 20,),
+                TextButton(
+              onPressed: () {
+                forgotPassword(context);
+              },
+              child: Text('Forgot Password?'),
+            ),
           Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -160,3 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 }
+void forgotPassword(BuildContext context) {
+    // Navigate to the forgot password screen
+   Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPasswordScreen (),));
+  }

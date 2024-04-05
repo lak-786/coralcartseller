@@ -121,7 +121,7 @@ class CartItemTile extends StatelessWidget {
         trailing: ElevatedButton(
           onPressed: () {
 
-            Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailsScreen(productName: '', price: '',),));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailsScreen(productName: productName, price: price,),));
           },
           child: Text(
             'Details',

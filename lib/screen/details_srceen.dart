@@ -8,15 +8,16 @@ class OrderDetailsScreen extends StatelessWidget {
     Key? key,
     required this.productName,
     required this.price,
-
-
   }) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order Details'),
+        title: Text(
+          'Order Details',
+          selectionColor: Colors.teal,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
